@@ -1,10 +1,11 @@
+const crypto = require('crypto');
 const test = require('tape');
 const path = require('path');
-const crypto = require('crypto');
+const fs = require('fs');
 
 const options = {
-    token: '',
-    repository: ''
+    token: 'b86a0840ccc3a072dc07961826137b0a70765d15',
+    repository: 'https://imlinhanchao.coding.net/p/demo/',
 };
 
 if (options.token == '' || options.repository == '') {
@@ -23,19 +24,16 @@ function hash(buffer) {
 
 (async () => {
 
-    const github = require('.')({
-        token: options.token,
-        repository
-    });
+    const coding = require('.')(options);
 
     console.log('wait for init.');
-    while (!github.isInitialized()) await sleep(100);
+    while (!coding.isInitialized()) await sleep(100);
     
     let filepath = path.resolve(__dirname, 'readme.md')
     
     test('Upload readme to repository', async function(assert) {
-        assert.deepEqual((await github.upload(filepath)).filename,
-            hash(fs.readFileSync(filepath)));
+        assert.deepEqual((await coding.upload(filepath)).filename,
+            hash(fs.readFileSync(filepath)) + '.md');
         assert.end()
     })
 
