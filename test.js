@@ -7,7 +7,7 @@ const options = {
     repository: ''
 };
 
-if (options.token == '' || options.domain == '' || options.repository == '') {
+if (options.token == '' || options.repository == '') {
     throw new Error('Please Edit file to config options first.');
 }
 
