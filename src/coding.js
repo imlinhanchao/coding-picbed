@@ -5,20 +5,22 @@ const path = require('path');
 const uuid = require('node-uuid');
 const mime = require('mime');
 
+let _options = {};
+
 module.exports = function ({
     token = null,
-    user = null,
-    project = null,
     repository = null,
 }) {
-    repository = repository || project
-    project = project || repo
+    let user, project, repo;
+
+    if (token && repository) config({ token, repository });
 
     // is the repository open source 
     async function isShare() {
+        if (!token || !project) throw new Error('You have to initialize first!')
 
         let rsp = await request({
-            api: `https://${user}.coding.net/api/user/${user}/project/${project}/depot/${repository}/git`,
+            api: `https://${user}.coding.net/api/user/${user}/project/${project}/depot/${repo}/git`,
             token,
         });
 
@@ -26,32 +28,41 @@ module.exports = function ({
     }
 
     async function getPageUrl() {
+        if (!token || !project) throw new Error('You have to initialize first!')
+
         let sites = await request({
             api: `https://${user}.coding.net/api/user/${user}/project/${project}/autodeploy/static-sites`,
             token,
         });
-        let data = {};
-        if (!sites.data) return data;
+
+        if (!sites.data) return [];
+
         sites = sites.data;
+
         for (let i = 0; i < sites.list.length; i++) {
             let l = sites.list[i];
             let id = l.id;
+
             let pages = await request({
                 api: `https://${user}.coding.net/api/user/${user}/project/${project}/autodeploy/static-sites/${id}`,
                 token,
             })
+
             let deploys = await request({
                 api: `https://${user}.coding.net/api/user/${user}/project/${project}/autodeploy/static-sites/${id}/tasks?page=1&page_size=10`,
                 token,
             });
+
             let lastDeploy = deploys.data.list[deploys.data.list.length - 1];
-            data[lastDeploy.depot_name] = pages.data.available_addresses
+            if (lastDeploy.depot_name == repo) return pages.data.available_addresses
         }
-        return data;
+        return [];
     }
 
     async function upload(file, name) {
-        let api = `https://${user}.coding.net/api/user/${user}/project/${project}/depot/${repository}/git/upload/master/`;
+        if (!token || !project) throw new Error('You have to initialize first!')
+
+        let api = `https://${user}.coding.net/api/user/${user}/project/${project}/depot/${repo}/git/upload/master/`;
         let rsp = await request({
             api, token,
         });
@@ -98,9 +109,63 @@ Content-Type: ${mime.getType(file)}\r
         return rsp
     }
 
+    async function config({
+        token, repository
+    }) {
+        if (repository == null) return;
+        if (repository.slice(-1) == '/') repository += '/';
+        if (repository.search(/https:\/\/([^.]*?).coding.net\/p\/([^\/]*?)\//) < 0) throw new Error('Invalid repository URL!');
+    
+        let mat = repository.match(/https:\/\/([^.]*?).coding.net\/p\/([^\/]*?)\/d\/([^\/]*?)\//);
+        if (!mat) mat = repository.match(/https:\/\/([^.]*?).coding.net\/p\/([^\/]*?)\//);
+    
+        user = mat[1];
+        project = mat[2];
+        repo = mat[3] || project;
+
+        _options.domains = null;
+        _options.isShare = await isShare()
+        _options.domains = await getPageUrl();
+
+        if (!_options.isShare && _options.domains.length == 0) throw new Error('The repository must be setting static website or open source.')
+    }
+
+    async function exist(filename) {
+        
+        let rsp = await request({
+            api: `https://${user}.coding.net/api/user/${user}/project/${project}/depot/${repo}/git/blob/master/${filename}`,
+            token,
+        });
+
+        return !rsp.data.file;
+    }
+
+    function hash(buffer) {
+        let sha256 = crypto.createHash('sha256');
+        let hash = sha256.update(buffer).digest('hex');
+        return hash;
+    }
+
     return {
-        isShare,
-        getPageUrl,
-        upload
+        async upload(file, filename) {
+            filename = filename || (hash(fs.readFileSync(file)) + path.extname(file));
+            if (!await exist(filename)) {
+                let rsp = await upload(file, filename);
+                if (rsp.code != 1217 // file exist
+                    && rsp.code != 0) throw new Error(`Upload file failed: ${rsp.msg[Object.keys(rsp.msg)[0]] || 'Unknown Error'}.`);
+            }
+            return {
+                filename,
+                url: [
+                    ..._options.domains.map(d => `http://${d}/${filename}`),
+                    ...(_options.isShare ? [`https://${user}.coding.net/p/${project}/d/${repo}/git/raw/master/${filename}`] : [])
+                ]
+            }
+              
+        },
+        isInitialized() {
+            return !!_options.domains
+        },
+        config
     }
 }
