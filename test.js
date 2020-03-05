@@ -15,6 +15,12 @@ function sleep (time) {
     return new Promise((resolve) => setTimeout(resolve, time));
 }
 
+function hash(buffer) {
+    let sha256 = crypto.createHash('sha256');
+    let hash = sha256.update(buffer).digest('hex');
+    return hash;
+}
+
 (async () => {
 
     const github = require('.')({
@@ -35,8 +41,3 @@ function sleep (time) {
 
 })()
 
-function hash(buffer) {
-    let sha256 = crypto.createHash('sha256');
-    let hash = sha256.update(buffer).digest('hex');
-    return hash;
-}
