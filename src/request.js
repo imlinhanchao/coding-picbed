@@ -4,7 +4,9 @@ module.exports = function ({
     api,
     token,
     data = null,
-    method = 'GET'
+    method = 'GET',
+    headers = {},
+    write = null
 }) {
     let hostname = new URL(api).hostname;
     let path = new URL(api).pathname;
@@ -15,9 +17,9 @@ module.exports = function ({
             path: path,
             method: method,
             headers: {
-                'Content-Type': 'application/json',
                 'Authorization': 'token ' + token,
-                'User-Agent': 'Coding-PicBad-App'
+                'User-Agent': 'Coding-PicBad-App',
+                ...headers
             }
         };
 
@@ -43,8 +45,10 @@ module.exports = function ({
             reject(e);
         });
 
-        if(data) req.write(JSON.stringify(data));
+        if(data) req.write(data);
 
-        req.end();
+        if(write) write(req);
+
+        if(!write) req.end();
     });
 }

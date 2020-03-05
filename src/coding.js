@@ -1,6 +1,9 @@
 const request = require('./request');
 const crypto = require('crypto');
 const fs = require('fs');
+const path = require('path');
+const uuid = require('node-uuid');
+const mime = require('mime');
 
 module.exports = function ({
     token = null,
@@ -47,8 +50,55 @@ module.exports = function ({
         return data;
     }
 
+    async function upload(file, name) {
+        let api = `https://${user}.coding.net/api/user/${user}/project/${project}/depot/${repository}/git/upload/master/`;
+        let rsp = await request({
+            api, token,
+        });
+        name = name || path.basename(file)
+        let lastCommitSha = rsp.data.lastCommit;
+        let data = {
+            message: '上传文件',
+            lastCommitSha,
+            newRef: ''
+        };
+        let boundaryKey = '------WebKitFormBoundary' + uuid.v4(); 
+        rsp = await request({
+            api, token, headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            write (req) {
+                req.write(
+                    `${boundaryKey} 
+Content-Disposition: form-data; name="message"; 
+
+${data.message}
+
+${boundaryKey} 
+Content-Disposition: form-data; name="lastCommitSha"
+
+${data.lastCommitSha}
+${boundaryKey} 
+Content-Disposition: form-data; name="newRef"
+
+
+${boundaryKey} 
+Content-Disposition: form-data; name="${name}"; filename="${name}"
+Content-Type: ${mime.getType(file)}`);
+            
+                let fileStream = fs.createReadStream(file);
+                fileStream.pipe(req, { end: false });
+                fileStream.on('end', function() {
+                    req.end(boundaryKey + '--');
+                });
+            }
+        });
+        return rsp
+    }
+
     return {
         isShare,
-        getPageUrl
+        getPageUrl,
+        upload
     }
 }

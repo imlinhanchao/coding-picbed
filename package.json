@@ -16,5 +16,8 @@
     "url": "https://github.com/imlinhanchao/coding-picbed/issues"
   },
   "homepage": "https://github.com/imlinhanchao/coding-picbed#readme",
-  "dependencies": {}
+  "dependencies": {
+    "mime": "^2.4.4",
+    "node-uuid": "^1.4.8"
+  }
 }
