@@ -18,6 +18,7 @@
   "homepage": "https://github.com/imlinhanchao/coding-picbed#readme",
   "dependencies": {
     "mime": "^2.4.4",
-    "node-uuid": "^1.4.8"
+    "node-uuid": "^1.4.8",
+    "tape": "^4.13.2"
   }
 }
