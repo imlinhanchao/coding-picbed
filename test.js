@@ -29,13 +29,13 @@ function hash(buffer) {
     });
 
     console.log('wait for init.');
-    while(!github.isInitialized()) await sleep(100);
+    while (!github.isInitialized()) await sleep(100);
+    
+    let filepath = path.resolve(__dirname, 'readme.md')
     
     test('Upload readme to repository', async function(assert) {
-        assert.deepEqual(await github.upload({
-            data: path.resolve(__dirname, 'readme.md'),
-            filename: 'readme.txt'
-        }).filename, hash(fs.readFileSync(path.resolve(__dirname, 'readme.md'))));
+        assert.deepEqual((await github.upload(filepath)).filename,
+            hash(fs.readFileSync(filepath)));
         assert.end()
     })
 
