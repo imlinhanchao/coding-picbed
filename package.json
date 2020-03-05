@@ -1,24 +1,33 @@
 {
   "name": "coding-picbed",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "Upload file to coding repository and Get Url",
+  "keywords": [
+    "coding",
+    "picture",
+    "upload",
+    "cdn"
+  ],
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/imlinhanchao/coding-picbed.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Hancel.Lin",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/imlinhanchao/coding-picbed/issues"
+    "url": "https://github.com/imlinhanchao/coding-picbed/issues",
+    "email": "imlinhanchao@gmail.com"
   },
   "homepage": "https://github.com/imlinhanchao/coding-picbed#readme",
   "dependencies": {
     "mime": "^2.4.4",
-    "node-uuid": "^1.4.8",
-    "tape": "^4.13.2"
+    "node-uuid": "^1.4.8"
+  },
+  "devDependencies": {
+    "tape": "~1.1.0"
   }
 }
