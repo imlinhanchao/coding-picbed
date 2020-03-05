@@ -147,16 +147,16 @@ Content-Type: ${mime.getType(file)}\r
     }
 
     return {
-        async upload(file, filename) {
-            filename = filename || (hash(fs.readFileSync(file)) + path.extname(file));
+        async upload(filepath, filename) {
+            filename = filename || (hash(fs.readFileSync(filepath)) + path.extname(filepath));
             if (!await exist(filename)) {
-                let rsp = await upload(file, filename);
+                let rsp = await upload(filepath, filename);
                 if (rsp.code != 1217 // file exist
                     && rsp.code != 0) throw new Error(`Upload file failed: ${rsp.msg[Object.keys(rsp.msg)[0]] || 'Unknown Error'}.`);
             }
             return {
                 filename,
-                url: [
+                urls: [
                     ..._options.domains.map(d => `http://${d}/${filename}`),
                     ...(_options.isShare ? [`https://${user}.coding.net/p/${project}/d/${repo}/git/raw/master/${filename}`] : [])
                 ]
