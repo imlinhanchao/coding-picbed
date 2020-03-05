@@ -62,34 +62,36 @@ module.exports = function ({
             lastCommitSha,
             newRef: ''
         };
-        let boundaryKey = '------WebKitFormBoundary' + uuid.v4(); 
+        let boundaryKey = '----WebKitFormBoundary' + uuid.v4(); 
         rsp = await request({
             api, token, headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            write (req) {
+                'Content-Type': 'multipart/form-data; boundary=' + boundaryKey
+            }, method: 'POST',
+            write(req) {
                 req.write(
-                    `${boundaryKey} 
-Content-Disposition: form-data; name="message"; 
-
-${data.message}
-
-${boundaryKey} 
-Content-Disposition: form-data; name="lastCommitSha"
-
-${data.lastCommitSha}
-${boundaryKey} 
-Content-Disposition: form-data; name="newRef"
-
-
-${boundaryKey} 
-Content-Disposition: form-data; name="${name}"; filename="${name}"
-Content-Type: ${mime.getType(file)}`);
+                    `--${boundaryKey}\r
+Content-Disposition: form-data; name="message"\r
+\r
+${data.message}\r
+\r
+--${boundaryKey}\r
+Content-Disposition: form-data; name="lastCommitSha"\r
+\r
+${data.lastCommitSha}\r
+--${boundaryKey}\r
+Content-Disposition: form-data; name="newRef"\r
+\r
+\r
+--${boundaryKey}\r
+Content-Disposition: form-data; name="${name}"; filename="${name}"\r
+Content-Type: ${mime.getType(file)}\r
+\r
+`);
             
                 let fileStream = fs.createReadStream(file);
                 fileStream.pipe(req, { end: false });
                 fileStream.on('end', function() {
-                    req.end(boundaryKey + '--');
+                    req.end('\r\n--' + boundaryKey + '--');
                 });
             }
         });
