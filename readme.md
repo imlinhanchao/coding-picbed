@@ -11,10 +11,10 @@ npm install coding-picbed
 ## 用法 
 
 ```javascript
-const github = require('coding-picbed')({
+const coding = require('coding-picbed')({
     token: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-    repository: 'https://github.com/imlinhanchao/upload-file'
-})
+    repository: 'https://imlinhanchao.coding.net/imlinhanchao/upload-file'
+});
 const path = require('path');
 const fs = require('fs');
 
@@ -24,7 +24,33 @@ router.post('/upload', async (req, res, next) => {
     let filepath = path.join(__dirname, filename);
 
     fs.writeFileSync(filepath, data)
-    let upload = await github.upload(filepath, filename);
+    let upload = await coding.upload(filepath, filename);
+    fs.unlinkSync(filepath);
+
+    res.json(upload);
+})
+```
+
+或者 
+
+```javascript
+const coding = require('coding-picbed');
+const path = require('path');
+const fs = require('fs');
+
+router.post('/upload', async (req, res, next) => {
+    
+    await coding.config({
+        token: req.query.token,
+        repository: req.query.repo
+    });
+
+    let data = req.files[0].buffer;
+    let filename = req.files[0].originalname;
+    let filepath = path.join(__dirname, filename);
+
+    fs.writeFileSync(filepath, data)
+    let upload = await coding.upload(filepath, filename);
     fs.unlinkSync(filepath);
 
     res.json(upload);
