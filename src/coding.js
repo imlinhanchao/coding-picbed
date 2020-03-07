@@ -133,7 +133,7 @@ async function exist(filename) {
         token,
     });
 
-    return !rsp.data.file;
+    return !!rsp.data.file;
 }
 
 function hash(buffer) {
