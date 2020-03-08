@@ -147,8 +147,9 @@ let interface = {
         filename = filename || (hash(fs.readFileSync(filepath)) + path.extname(filepath));
         if (!await exist(filename)) {
             let rsp = await upload(filepath, filename);
+            if (rsp.code == 1216) return this.upload(filepath, filename);
             if (rsp.code != 1217 // file exist
-                && rsp.code != 0) throw new Error(`Upload file failed: ${rsp.msg[Object.keys(rsp.msg)[0]] || 'Unknown Error'}.`);
+                && rsp.code != 0) throw new Error(`Upload file failed(${rsp.code}): ${rsp.msg[Object.keys(rsp.msg)[0]] || 'Unknown Error'}.`);
         }
         return {
             filename,
