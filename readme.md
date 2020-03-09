@@ -34,12 +34,13 @@ router.post('/upload', async (req, res, next) => {
 或者 
 
 ```javascript
-const coding = require('coding-picbed');
+const { Coding } = require('coding-picbed');
 const path = require('path');
 const fs = require('fs');
 
 router.post('/upload', async (req, res, next) => {
-    
+
+    let coding = new Coding();
     await coding.config({
         token: req.query.token,
         repository: req.query.repo
