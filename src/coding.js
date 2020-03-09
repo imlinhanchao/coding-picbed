@@ -65,7 +65,7 @@ class Coding
             token: this.token,
         });
     
-        if (rsp.code) throw new Error(rsp.msg);
+        if (rsp.code) throw new Error(rsp.msg[Object.keys(rsp.msg)[0]] || 'Unknown Error');
 
         return !!rsp.data.file;
     }
@@ -128,7 +128,7 @@ Content-Type: ${mime.getType(file)}\r
             token: this.token,
         });
 
-        if (rsp.code) throw new Error(rsp.msg);
+        if (rsp.code) throw new Error(rsp.msg[Object.keys(rsp.msg)[0]] || 'Unknown Error');
         if (!rsp.data.depot) throw new Error('The Repository was not exist');
 
         return rsp.data.depot.shared
@@ -142,7 +142,7 @@ Content-Type: ${mime.getType(file)}\r
             token: this.token,
         });
 
-        if (sites.code) throw new Error(rsp.msg);
+        if (sites.code) throw new Error(rsp.msg[Object.keys(rsp.msg)[0]] || 'Unknown Error');
         if (!sites.data) return [];
     
         sites = sites.data;
