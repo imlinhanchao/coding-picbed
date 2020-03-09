@@ -38,7 +38,7 @@ class Coding
 
     async config({ token, repository }) {
         if (repository == null) return;
-        if (repository.slice(-1) == '/') repository += '/';
+        if (repository.slice(-1) != '/') repository += '/';
         if (repository.search(/https:\/\/([^.]*?).coding.net\/p\/([^\/]*?)\//) < 0) throw new Error('Invalid repository URL!');
     
         let mat = repository.match(/https:\/\/([^.]*?).coding.net\/p\/([^\/]*?)\/d\/([^\/]*?)\//);
@@ -141,7 +141,7 @@ Content-Type: ${mime.getType(file)}\r
     
         sites = sites.data;
     
-        for (let i = 0; i < sites.list.length; i++) {
+        for (let i = 0; i < sites.total_page; i++) {
             let l = sites.list[i];
             let id = l.id;
     
