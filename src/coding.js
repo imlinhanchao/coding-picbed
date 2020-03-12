@@ -18,10 +18,13 @@ class Coding
         return !!this.domains
     }
 
-    async upload(filepath, filename) {
+    async upload(filepath, dir, filename) {
         filename = filename || (hash(fs.readFileSync(filepath)) + path.extname(filepath));
-        if (!await this.exist(filename)) {
-            let rsp = await this._upload(filepath, filename);
+        dir = dir.replace(/^\/|\/$/, '');
+        let savepath = dir + '/' + filename;
+        savepath = savepath.replace(/^\/|\/$/, '');
+        if (!await this.exist(savepath)) {
+            let rsp = await this._upload(filepath, dir, filename);
             if (rsp.code == 1216) return this.upload(filepath, filename);
             if (rsp.code != 1217 // file exist
                 && rsp.code != 0) throw new Error(`Upload file failed(${rsp.code}): ${rsp.msg[Object.keys(rsp.msg)[0]] || 'Unknown Error'}.`);
@@ -29,8 +32,8 @@ class Coding
         return {
             filename,
             urls: [
-                ...this.domains.map(d => `http://${d}/${filename}`),
-                ...(this.isShare ? [`https://${this.user}.coding.net/p/${this.project}/d/${this.repo}/git/raw/master/${filename}`] : [])
+                ...this.domains.map(d => `http://${d}/${savepath}`),
+                ...(this.isShare ? [`https://${this.user}.coding.net/p/${this.project}/d/${this.repo}/git/raw/master/${savepath}`] : [])
             ]
         }
           
@@ -70,10 +73,10 @@ class Coding
         return !!rsp.data.file;
     }
     
-    async _upload(file, name) {
+    async _upload(file, dir, name) {
         if (!this.token || !this.project) throw new Error('You have to initialize first!')
     
-        let api = `https://${this.user}.coding.net/api/user/${this.user}/project/${this.project}/depot/${this.repo}/git/upload/master/`;
+        let api = `https://${this.user}.coding.net/api/user/${this.user}/project/${this.project}/depot/${this.repo}/git/upload/master/${dir}`;
         let rsp = await request({
             api, token: this.token,
         });

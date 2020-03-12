@@ -24,7 +24,7 @@ router.post('/upload', async (req, res, next) => {
     let filepath = path.join(__dirname, filename);
 
     fs.writeFileSync(filepath, data)
-    let upload = await coding.upload(filepath, filename);
+    let upload = await coding.upload(filepath, '/', filename);
     fs.unlinkSync(filepath);
 
     res.json(upload);
@@ -51,7 +51,7 @@ router.post('/upload', async (req, res, next) => {
     let filepath = path.join(__dirname, filename);
 
     fs.writeFileSync(filepath, data)
-    let upload = await coding.upload(filepath, filename);
+    let upload = await coding.upload(filepath, '/', filename);
     fs.unlinkSync(filepath);
 
     res.json(upload);
@@ -89,13 +89,14 @@ async function isInitialized();
 ### 上传文件
 
 ```javascript
-async function upload(filepath, filename);
+async function upload(filepath, dir, filename);
 ```
 
 #### 参数对象
 |键|描述|
 |--|--|
 |filepath|您要上传的文件路径。|
+|dir|你要保存到仓库的文件夹，若不存在会自动创建。（可选）|
 |filename|你要保存到仓库的文件名。（可选）|
 
 #### 返回值
