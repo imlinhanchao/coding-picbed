@@ -165,7 +165,7 @@ Content-Type: ${mime.getType(file)}\r
             });
     
             let lastDeploy = deploys.data.list[deploys.data.list.length - 1];
-            if (lastDeploy.depot_name == this.repo) return pages.data.available_addresses
+            if (lastDeploy && lastDeploy.depot_name == this.repo) return pages.data.available_addresses
         }
         return [];
     }
