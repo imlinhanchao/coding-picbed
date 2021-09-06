@@ -61,7 +61,7 @@ router.post('/upload', async (req, res, next) => {
 ## 准备
 
 1. 您需要在个人设置[访问令牌](https://help.coding.net/docs/member/tokens.html)中创建访问令牌. 只需要开放 `project|project:depot|project:file` 权限即可。
-2. 创建用于上传文件的存储库，开通『构建与部署』中**静态网站**服务或公开仓库源代码。
+~~2. 创建用于上传文件的存储库，开通『构建与部署』中**静态网站**服务或公开仓库源代码。~~
 
 ## 函数
 
@@ -74,7 +74,7 @@ async function config({ token, repository });
 #### 参数对象
 |键|描述|
 |--|--|
-|token|你创建的 GitHub 访问令牌。|
+|token|你创建的 Coding 访问令牌。|
 |repository|你的用于上传文件存储库地址。|
 
 ### 检查初始化状态
