@@ -52,12 +52,11 @@ class Coding
         this.project = mat[2];
         this.repo = mat[3] || this.project;
     
-        this.domains = null;
         this.isShare = await this._isShare()
-        this.domains = await this._getPageUrl();
+        this.domains = [];
     
-        if (!this.isShare && this.domains.length == 0)
-            throw new Error('The repository must be setting static website or open source.')    
+        if (!this.isShare)
+            throw new Error('The repository must be open source.')    
     }
 
     async exist(filename) {
@@ -145,7 +144,7 @@ Content-Type: ${mime.getType(file)}\r
             token: this.token,
         });
 
-        if (sites.code) throw new Error(rsp.msg[Object.keys(rsp.msg)[0]] || 'Unknown Error');
+        if (sites.code) throw new Error(sites.msg[Object.keys(rsp.msg)[0]] || 'Unknown Error');
         if (!sites.data) return [];
     
         sites = sites.data;
